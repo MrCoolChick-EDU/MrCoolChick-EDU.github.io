@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Urinal Game</title>
+    <style>
+        .urinals {
+            display: flex;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        .urinal {
+            width: 50px;
+            height: 80px;
+            background: #e0e0e0;
+            border: 2px solid #888;
+            border-radius: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .urinal.taken {
+            background: #4caf50;
+            color: #fff;
+            cursor: not-allowed;
+        }
+        .urinal.blocked {
+            background: #bdbdbd;
+            color: #888;
+            cursor: not-allowed;
+        }
+        body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Urinal Game</h1>
+<p>規則：你和電腦輪流選擇小便斗，每次選擇後，該小便斗及左右兩側都不能再選。最後一個選到小便斗者獲勝！</p>
+<p>
+    小便斗數量：
+    <input type="range" id="urinalSlider" min="1" max="13" value="7" oninput="updateUrinalCount(this.value)">
+    <span id="urinalCountLabel">7</span>
+</p>
+<div class="urinals" id="urinals"></div>
+<p id="status"></p>
+<button onclick="restartGame()">重新開始</button>
+
+<script>
+let urinalCount = 9; // 小便斗數量
+let urinals = [];
+let gameOver = false;
+let playerTurn = true;
+
+function updateUrinalCount(val) {
+    urinalCount = parseInt(val);
+    document.getElementById('urinalCountLabel').innerText = val;
+    restartGame();
+}
+
+function renderUrinals() {
+    const container = document.getElementById('urinals');
+    container.innerHTML = '';
+    urinals.forEach((u, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'urinal';
+        if (u === 1) btn.classList.add('taken');
+        if (u === 2) btn.classList.add('blocked');
+        btn.disabled = u !== 0 || gameOver || (!playerTurn && u === 0); // 禁用已選或封鎖的按鈕
+        btn.innerText = u === 1 ? '你' : (u === 3 ? '電' : ''); // 顯示玩家或電腦的標記
+        btn.onclick = () => playerMove(i);
+        container.appendChild(btn);
+    });
+}
+
+function blockAdjacent(idx) {
+    if (idx > 0 && urinals[idx-1] === 0) urinals[idx-1] = 2;
+    if (idx < urinalCount-1 && urinals[idx+1] === 0) urinals[idx+1] = 2;
+}
+
+function playerMove(idx) {
+    if (!playerTurn || urinals[idx] !== 0 || gameOver) return;
+    urinals[idx] = 1;
+    blockAdjacent(idx);
+    renderUrinals();
+    if (checkGameOver()) return; // 檢查遊戲是否結束
+    playerTurn = false; // 轉換到電腦回合
+    setStatus('電腦思考中...');
+    setTimeout(computerMove, 1000); // 模擬電腦思考時間
+}
+
+function computerMove() {
+    let available = urinals.map((u, i) => u === 0 ? i : -1).filter(i => i !== -1);
+    if (available.length === 0) {
+        checkGameOver();
+        return;
+    }
+    const idx = available[Math.floor(Math.random() * available.length)];
+    urinals[idx] = 3;
+    blockAdjacent(idx);
+    renderUrinals();
+    if (checkGameOver()) return; // 檢查遊戲是否結束
+    playerTurn = true; // 重新輪到玩家
+    setStatus('輪到你了！');
+    renderUrinals(); // 確保畫面刷新並啟用按鈕
+}
+
+function checkGameOver() {
+    let available = urinals.some(u => u === 0);
+    if (!available) {
+        gameOver = true;
+        // 判斷最後一個佔據小便斗的人
+        if (playerTurn) {
+            setStatus('你是最後一個佔據小便斗的人，恭喜你獲勝！');
+        } else {
+            setStatus('電腦是最後一個佔據小便斗的人，你落敗了。');
+        }
+        return true;
+    }
+    return false;
+}
+
+function setStatus(msg) {
+    document.getElementById('status').innerText = msg;
+}
+
+function restartGame() {
+    urinals = Array(urinalCount).fill(0); // 0:可選, 1:玩家, 2:封鎖, 3:電腦
+    gameOver = false;
+    playerTurn = true;
+    setStatus('請選擇一個小便斗開始遊戲！');
+    renderUrinals();
+}
+
+// 初始化
+restartGame();
+</script>
+
+</body>
+</html>
