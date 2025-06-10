@@ -59,10 +59,10 @@ let gameOver = false;
 let playerTurn = true;
 
 function getUrinalImg(u) {
-    if (u === 1) return "./image/urinal_player.JPG";
-    if (u === 2) return "./image/urinal_blocked.JPG";
-    if (u === 3) return "./image/urinal_computer.JPG";
-    return "./image/urinal.JPG";
+    if (u === 1) return "./images/urinal_player.JPG";
+    if (u === 2) return "./images/urinal_blocked.JPG";
+    if (u === 3) return "./images/urinal_computer.JPG";
+    return "./images/urinal.JPG";
 }
 
 function updateUrinalCount(val) {
@@ -80,7 +80,7 @@ function renderUrinals() {
         btn.disabled = u !== 0 || gameOver || (!playerTurn && u === 0);
         const img = document.createElement('img');
         img.src = getUrinalImg(u);
-        img.alt = '';
+        img.alt = 'urinal ' + (i + 1);
         btn.appendChild(img);
         btn.onclick = () => playerMove(i);
         container.appendChild(btn);
@@ -136,7 +136,7 @@ function checkGameOver() {
 }
 
 function playLoseSound() {
-    const audio = new Audio('./sound/lose_sound.mp3');
+    const audio = new Audio('./sounds/lose_sound.mp3');
     audio.play();
 }
 
