@@ -37,6 +37,9 @@
             font-family: 'Microsoft JhengHei', '微軟正黑體', Arial, sans-serif;
             margin-bottom: 10px;
         }
+        #status {
+            font-size: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -58,6 +61,7 @@ let urinals = [];
 let gameOver = false;
 let playerTurn = true;
 
+// 0:可選, 1:玩家, 2:封鎖, 3:電腦
 function getUrinalImg(u) {
     if (u === 1) return "./images/urinal_player.JPG";
     if (u === 2) return "./images/urinal_blocked.JPG";
@@ -95,6 +99,7 @@ function blockAdjacent(idx) {
 function playerMove(idx) {
     if (!playerTurn || urinals[idx] !== 0 || gameOver) return;
     urinals[idx] = 1;
+    playClickSound();
     blockAdjacent(idx);
     renderUrinals();
     if (checkGameOver()) return; // 檢查遊戲是否結束
@@ -126,6 +131,7 @@ function checkGameOver() {
         // 判斷最後一個佔據小便斗的人
         if (playerTurn) {
             setStatus('你是最後一個佔據小便斗的人，恭喜你獲勝！');
+            playWinSound();
         } else {
             setStatus('電腦是最後一個佔據小便斗的人，你落敗了。');
             playLoseSound();
@@ -137,6 +143,17 @@ function checkGameOver() {
 
 function playLoseSound() {
     const audio = new Audio('./sounds/lose_sound.mp3');
+    audio.volume = 0.7; // 音量調低
+    audio.play();
+}
+
+function playWinSound() {
+    const audio = new Audio('./sounds/win_sound.mp3');
+    audio.play();
+}
+
+function playClickSound() {
+    const audio = new Audio('./sounds/click_sound.mp3');
     audio.play();
 }
 
