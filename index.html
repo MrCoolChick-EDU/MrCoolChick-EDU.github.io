@@ -59,10 +59,10 @@ let gameOver = false;
 let playerTurn = true;
 
 function getUrinalImg(u) {
-    if (u === 1) return "urinal_player.jpg";
-    if (u === 2) return "urinal_blocked.jpg";
-    if (u === 3) return "urinal_computer.jpg";
-    return "urinal.jpg";
+    if (u === 1) return "./image/urinal_player.JPG";
+    if (u === 2) return "./image/urinal_blocked.JPG";
+    if (u === 3) return "./image/urinal_computer.JPG";
+    return "./image/urinal.JPG";
 }
 
 function updateUrinalCount(val) {
@@ -136,7 +136,7 @@ function checkGameOver() {
 }
 
 function playLoseSound() {
-    const audio = new Audio('lose_sound.mp3');
+    const audio = new Audio('./sound/lose_sound.mp3');
     audio.play();
 }
 
